@@ -1,4 +1,4 @@
-The TD1 is an invaluable tool for reading values into Hueforge, but it is desired to store all filament information in a single database and not have to enter details more than once.  This repository is one approach to streamline the procss.
+The TD1 is an invaluable tool for reading values into Hueforge, but it is desirable to store all filament information in a single database and not have to enter details more than once.  This repository is my attempt to streamline the procss.
 
 Instead of creating a custom API or app, this:
 - Uses the browser to read TD1 from the connected TD1 directly
@@ -9,7 +9,7 @@ The next step is to export your database from Spoolman to HueForge.  Barring an 
 
 # Usage
 
-To read values from your TD1 without any other dependencies, simply visit the index.html page in any browser and press 'Connect' with your TD1 connected.  TODO: Link to github hosted HTML page here.
+To read values from your TD1 without any other dependencies, simply visit the index.html page in any browser and press 'Connect' with your TD1 connected.  [Try it out here.](https://github.com/Digicrat/td1_browser)
 
 To read values directly into Spoolman, visit spoolman.html (see Setup section for details/caveats). Navigate within Spoolman on the left to create a new Filament and/or Spool as desired.  After reading a filament, simply press the 'Copy values' button on the right to automatically populate the 'extra' field in Spoolman's existing UI. If adding multiple filaments in a row, you can check 'Auto' to copy it automatically on each reading.
 
