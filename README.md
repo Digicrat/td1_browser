@@ -9,7 +9,7 @@ The next step is to export your database from Spoolman to HueForge.  Barring an 
 
 # Usage
 
-To read values from your TD1 without any other dependencies, simply visit the index.html page in any browser and press 'Connect' with your TD1 connected.  [Try it out here.](https://github.com/Digicrat/td1_browser)
+To read values from your TD1 without any other dependencies, simply visit the index.html page in any browser and press 'Connect' with your TD1 connected.  [Try it out here.](https://digicrat.github.io/td1_browser/)
 
 To read values directly into Spoolman, visit spoolman.html (see Setup section for details/caveats). Navigate within Spoolman on the left to create a new Filament and/or Spool as desired.  After reading a filament, simply press the 'Copy values' button on the right to automatically populate the 'extra' field in Spoolman's existing UI. If adding multiple filaments in a row, you can check 'Auto' to copy it automatically on each reading.
 
