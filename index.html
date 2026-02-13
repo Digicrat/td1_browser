@@ -1,67 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Serial Test</title>
-  <style>
-    body { font-family: monospace; margin: 20px; }
-    #output {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 300px;
-      overflow-y: scroll;
-      white-space: pre-wrap;
-      background: #111;
-      color: #0f0;
-    }
-    button { font-size: 16px; padding: 10px; }
-  </style>
-</head>
-<body>
+<meta charset="utf-8">
+<title>TD1s Serial Tool</title>
 
-<h2>Serial UART Test</h2>
+<style>
+body { font-family: monospace; margin: 20px; background:#111; color:#eee; }
 
-<button id="connectBtn">Connect to Serial Device</button>
+button { padding: 8px 14px; margin-right: 10px; }
 
-<h3>Output</h3>
-<div id="output"></div>
+#status { margin: 10px 0; }
 
-<script>
-const connectBtn = document.getElementById("connectBtn");
-const outputDiv = document.getElementById("output");
-
-function log(text) {
-  console.log(text);
-  outputDiv.textContent += text;
-  outputDiv.scrollTop = outputDiv.scrollHeight;
+#log {
+  border: 1px solid #444;
+  padding: 10px;
+  height: 200px;
+  overflow-y: auto;
+  background: #000;
+  color: #0f0;
+  white-space: pre;
 }
 
-connectBtn.addEventListener("click", async () => {
-  try {
-    // Prompt user to select serial device
-    const port = await navigator.serial.requestPort();
+#tdBox {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #444;
+  display: inline-block;
+}
 
-    // Open port (adjust baud rate for your TD1s)
-    await port.open({ baudRate: 115200 });
+#colorSwatch {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #fff;
+  margin-top: 10px;
+}
+</style>
+</head>
 
-    log("Connected.\n");
+<body>
 
-    const decoder = new TextDecoderStream();
-    port.readable.pipeTo(decoder.writable);
+<h2>TD1s Serial Monitor</h2>
 
-    const reader = decoder.readable.getReader();
+<button id="connectBtn">Connect</button>
+<button id="disconnectBtn" disabled>Disconnect</button>
 
-    // Read loop
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      if (value) log(value);
+<div id="status">Disconnected</div>
+
+<div id="log"></div>
+
+<div id="tdBox">
+  <div>TD Value: <span id="tdValue">--</span></div>
+  <div>Color Code: <span id="colorCode">--</span></div>
+  <div id="colorSwatch"></div>
+</div>
+
+<script type="module">
+import { SerialManager } from "./serial.js";
+
+const logDiv = document.getElementById("log");
+const statusDiv = document.getElementById("status");
+
+const tdValueSpan = document.getElementById("tdValue");
+const colorCodeSpan = document.getElementById("colorCode");
+const colorSwatch = document.getElementById("colorSwatch");
+
+const connectBtn = document.getElementById("connectBtn");
+const disconnectBtn = document.getElementById("disconnectBtn");
+
+function log(line) {
+  console.log(line);
+  logDiv.textContent += line + "\n";
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+function setStatus(s) {
+  statusDiv.textContent = s;
+}
+
+function parseTD1sLine(line) {
+  if (!line.includes(",")) return null;
+
+  const cols = line.split(",");
+
+  // Expect at least 6 columns (based on your example)
+  if (cols.length < 6) return null;
+
+  const td = cols[cols.length - 2];
+  const color = cols[cols.length - 1];
+
+  // Validate TD numeric
+  if (isNaN(parseFloat(td))) return null;
+
+  // Validate color hex
+  if (!/^[0-9A-Fa-f]{6}$/.test(color)) return null;
+
+  return {
+    td: parseFloat(td),
+    color: color.toUpperCase()
+  };
+}
+
+const serial = new SerialManager({
+  baudRate: 115200,
+
+  onStatus: msg => {
+    setStatus(msg);
+
+    if (msg === "Connected") {
+      connectBtn.disabled = true;
+      disconnectBtn.disabled = false;
+    } else if (msg === "Disconnected") {
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
     }
+  },
 
-  } catch (err) {
-    log("Error: " + err + "\n");
+  onLine: line => {
+    log(line);
+
+    const parsed = parseTD1sLine(line);
+    if (!parsed) return;
+
+    tdValueSpan.textContent = parsed.td;
+    colorCodeSpan.textContent = parsed.color;
+    colorSwatch.style.background = "#" + parsed.color;
   }
 });
+
+connectBtn.onclick = () => serial.connect();
+disconnectBtn.onclick = () => serial.disconnect();
+
 </script>
 
 </body>
