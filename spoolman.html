@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TD1s → Spoolman Bridge</title>
+
+<style>
+body {
+  margin:0;
+  font-family: monospace;
+  background:#111;
+  color:#eee;
+}
+
+#container {
+  display:flex;
+  height:100vh;
+}
+
+#spoolmanContainer {
+  flex:1;
+  border-right:2px solid #333;
+}
+
+#spoolmanFrame {
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+#controlPanel {
+  width:320px;
+  padding:15px;
+  box-sizing:border-box;
+  background:#1a1a1a;
+  display:flex;
+  flex-direction:column;
+}
+
+.block {
+  margin-bottom:18px;
+}
+
+button {
+  padding:8px 14px;
+  margin-right:6px;
+}
+
+#log {
+  height:160px;
+  overflow:auto;
+  background:#000;
+  border:1px solid #444;
+  padding:6px;
+  white-space:pre;
+  font-size:12px;
+}
+
+#colorSwatch {
+  width:50px;
+  height:50px;
+  border:1px solid #fff;
+  margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="container">
+
+  <!-- LEFT: Spoolman -->
+  <div id="spoolmanContainer">
+    <iframe id="spoolmanFrame" src="/spoolman"></iframe> 
+  </div>
+
+  <!-- RIGHT: Controls -->
+  <div id="controlPanel">
+
+    <div class="block">
+      <button id="connectBtn">Connect</button>
+      <button id="disconnectBtn" disabled>Disconnect</button>
+      <div id="status">Disconnected</div>
+    </div>
+
+    <div class="block">
+      <div>TD: <span id="tdValue">--</span></div>
+      <div>Color: <span id="colorCode">--</span></div>
+      <div id="colorSwatch"></div>
+    </div>
+
+    <div class="block">
+      <button id="copyBtn">Copy Values → Spoolman</button>
+      <BR>
+      <label>
+        <input type="checkbox" id="autoCopyChk">
+        Auto copy on new value
+      </label>
+    </div>
+
+    <div class="block">
+      <div id="log"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+import { SerialManager } from "./serial.js";
+
+/* ---------- UI refs ---------- */
+
+const logDiv = document.getElementById("log");
+const statusDiv = document.getElementById("status");
+
+const tdValueSpan = document.getElementById("tdValue");
+const colorCodeSpan = document.getElementById("colorCode");
+const colorSwatch = document.getElementById("colorSwatch");
+
+const connectBtn = document.getElementById("connectBtn");
+const disconnectBtn = document.getElementById("disconnectBtn");
+
+const spoolFrame = document.getElementById("spoolmanFrame");
+
+const copyBtn = document.getElementById("copyBtn");
+const autoCopyChk = document.getElementById("autoCopyChk");
+
+/* ---------- Logging ---------- */
+
+function log(line) {
+  logDiv.textContent += line + "\n";
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+function setStatus(s) {
+  statusDiv.textContent = s;
+}
+
+/* ---------- TD1s Parser ---------- */
+
+function parseTD1sLine(line) {
+  if (!line.includes(",")) return null;
+
+  const cols = line.split(",");
+  if (cols.length < 6) return null;
+
+  const td = cols[cols.length - 2];
+  const color = cols[cols.length - 1];
+
+  if (isNaN(parseFloat(td))) return null;
+  if (!/^[0-9A-Fa-f]{6}$/.test(color)) return null;
+
+  return {
+    td: parseFloat(td),
+    color: color.toUpperCase()
+  };
+}
+
+/* ---------- Spoolman Injection ---------- */
+
+function copyValuesToSpoolman(td, color) {
+  try {
+    const doc = spoolFrame.contentWindow.document;
+
+    const tdField = doc.getElementById("extra_td");
+    if (tdField) tdField.value = td;
+
+    const colorField = doc.getElementById("extra_color");
+    if (colorField) colorField.value = color;
+
+    log("Values copied into Spoolman page");
+
+  } catch (e) {
+    log("Failed to access Spoolman iframe: " + e);
+  }
+}
+
+/* ---------- Serial ---------- */
+
+let lastTD = null;
+let lastColor = null;
+
+const serial = new SerialManager({
+  baudRate: 115200,
+
+  onStatus: msg => {
+    setStatus(msg);
+
+    if (msg === "Connected") {
+      connectBtn.disabled = true;
+      disconnectBtn.disabled = false;
+    } else if (msg === "Disconnected") {
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
+    }
+  },
+
+  onLine: line => {
+    log(line);
+
+    const parsed = parseTD1sLine(line);
+    if (!parsed) return;
+
+    lastTD = parsed.td;
+    lastColor = parsed.color;
+
+    tdValueSpan.textContent = parsed.td;
+    colorCodeSpan.textContent = parsed.color;
+    colorSwatch.style.background = "#" + parsed.color;
+
+    if (autoCopyChk.checked) {
+      copyValuesToSpoolman(parsed.td, parsed.color);
+    }
+  }
+});
+
+/* ---------- Buttons ---------- */
+  connectBtn.onclick = () => {
+      serial.connect();
+  }
+disconnectBtn.onclick = () => serial.disconnect();
+
+copyBtn.onclick = () => {
+  if (lastTD == null) return;
+  copyValuesToSpoolman(lastTD, lastColor);
+};
+</script>
+
+</body>
+</html>
