@@ -102,12 +102,18 @@ button {
       <div id="log"></div>
     </div>
 
+    <div class="block">
+      <button id="exportBtn">Generate HueForge DB</button>
+    </div>
+
+    
   </div>
 
 </div>
 
 <script type="module">
-import { SerialManager } from "./serial.js";
+  import { SerialManager } from "./serial.js";
+  import { exportToHueforge } from "./hueforge.js";
 
 /* ---------- UI refs ---------- */
 
@@ -126,6 +132,7 @@ const spoolFrame = document.getElementById("spoolmanFrame");
 const copyBtn = document.getElementById("copyBtn");
 const autoCopyChk = document.getElementById("autoCopyChk");
 
+const exportBtn = document.getElementById("exportBtn");
 /* ---------- Logging ---------- */
 
 function log(line) {
@@ -218,13 +225,20 @@ const serial = new SerialManager({
 /* ---------- Buttons ---------- */
   connectBtn.onclick = () => {
       serial.connect();
-  }
+  };
 disconnectBtn.onclick = () => serial.disconnect();
 
 copyBtn.onclick = () => {
   if (lastTD == null) return;
   copyValuesToSpoolman(lastTD, lastColor);
 };
+
+
+  exportBtn.onclick = exportToHueforge;
+  /*() => {
+  console.log("Export clicked");
+};*/
+  
 </script>
 
 </body>

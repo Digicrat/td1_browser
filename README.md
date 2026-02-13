@@ -5,7 +5,7 @@ Instead of creating a custom API or app, this:
 - Opens Spoolman as an iframe and fills out a custom TD field on demand within the nominal Spoolman UI for defining filaments or spools.
 
 
-The next step is to export your database from Spoolman to HueForge.  Barring an official Hueforge integration/plugin, one approach is to export the Spoolman data to a JSON file compatible with HueForge's filament database. This should be fairly simple and I hope to get to implementing it soon.
+*UNTESTED* The "Generate Hueforge DB" button will download a JSON file that can be imported into HueForge as a new Filament DB/Set. This is a first-cut at such a feature and has not yet been tested in HueForge.  Spoolman's 'archived' flag is inverted to become HueForge's 'owned' flag.  Future updates may add additional filtering options.
 
 # Usage
 
@@ -42,7 +42,13 @@ Optionally define a second custom field for "color" to store the raw color code 
 
 TODO: Ideally this would also set the Color value in the 'Create Filament' page, but I haven't figured out how to updae that form value via this add-on yet. 
 
-TODO: Hueforge uses a unique UUID value for each filament in it's DB. It may be necessary to add this to spoolman as an additional 'extra' field.
+TODO: Hueforge uses a unique UUID value for each filament in it's DB. It may be necessary to add this to spoolman as an additional 'extra' field.  For now, we randomly generate a new one on each export.
+
+# Limitations
+
+The Web Serial API should work on any modern browser under Linux, Mac, or Windows. Unfortunately, no Android browser currently appears to support the API.
+
+
 
 
 # License
