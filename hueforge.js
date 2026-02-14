@@ -16,7 +16,7 @@ function spoolToHueforge(spool) {
 	Tags: [],
 	Transmissivity: td,
 	Type: filament.material || "PLA",
-	uuid: "{" + newUUID() + "}"
+	//uuid: "{" + newUUID() + "}"
     };
 }
 function downloadJSON(obj, filename) {

@@ -42,7 +42,6 @@ Optionally define a second custom field for "color" to store the raw color code 
 
 TODO: Ideally this would also set the Color value in the 'Create Filament' page, but I haven't figured out how to updae that form value via this add-on yet. 
 
-TODO: Hueforge uses a unique UUID value for each filament in it's DB. It may be necessary to add this to spoolman as an additional 'extra' field.  For now, we randomly generate a new one on each export.
 
 # Limitations
 
