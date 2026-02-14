@@ -47,7 +47,7 @@ TODO: Ideally this would also set the Color value in the 'Create Filament' page,
 
 The Web Serial API should work on any modern browser under Linux, Mac, or Windows. Unfortunately, no Android browser currently appears to support the API.
 
-
+Note: This is for reading the values from the TD1 only.  It's still beneficial to plug the TD1 into Hueforge periodically to ensure you have the latest firmware version. It is possible that future firmware updates could break this integration and require corresponding updates if they change the output formatting.
 
 
 # License
