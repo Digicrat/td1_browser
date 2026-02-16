@@ -19,8 +19,10 @@ Navigate within Spoolman on the left to create (or update) a new Filament and/or
 # Setup
 This is a static HTML/JS modification.  Simply host it appropriately and configure spoolman custom fields.
 
+Note: Browser security requirements will prevent Spoolman features (set td field, download filament DB), aside from initially loading the iframe, from working if Spoolman isn't hosted on the same hostname and port. Adding a reverse proxy with nginx or Apache is the simplest approach.
+
 ## Proxy Hosting
-This assumes that spoolman is available at "./spoolman" by default.  If that is not the case, edit the iframe definition in spoolman.html.  Some features may not work correctly if hosted on a different server.
+This assumes that spoolman is available at "./spoolman" by default.  If that is not the case, edit the iframe definition in spoolman.html or use the provided form to temporarily specify an alternate path.  
 
 On my server:
 - This repo is at /td1 of an Apache server
