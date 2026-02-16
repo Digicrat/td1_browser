@@ -62,6 +62,18 @@ button {
   border:1px solid #fff;
   margin-top:6px;
 }
+
+#settingsPanel {
+  background:#111;
+  padding:10px;
+  border:1px solid #333;
+}
+
+#settingsToggleBtn {
+  font-size:18px;
+  padding:4px 8px;
+}
+
 </style>
 </head>
 
@@ -71,11 +83,21 @@ button {
 
   <!-- LEFT: Spoolman -->
   <div id="spoolmanContainer">
-    <iframe id="spoolmanFrame" src="/spoolman"></iframe> 
+    <iframe id="spoolmanFrame"></iframe> 
   </div>
 
   <!-- RIGHT: Controls -->
   <div id="controlPanel">
+<div class="block" style="display:flex; justify-content:space-between; align-items:center;">
+  <b>Controls</b>
+  <button id="settingsToggleBtn" title="Settings">⚙</button>
+</div>
+
+<div id="settingsPanel" class="block" style="display:none;">
+  <label>Spoolman URL</label>
+  <input id="spoolmanUrlInput" type="text" value="/spoolman">
+  <button id="applySpoolmanUrlBtn">Load</button>
+</div>
 
     <div class="block">
       <button id="connectBtn">Connect</button>
@@ -133,6 +155,44 @@ const copyBtn = document.getElementById("copyBtn");
 const autoCopyChk = document.getElementById("autoCopyChk");
 
 const exportBtn = document.getElementById("exportBtn");
+const settingsBtn = document.getElementById("settingsToggleBtn");
+const settingsPanel = document.getElementById("settingsPanel");
+const spoolUrlInput = document.getElementById("spoolmanUrlInput");
+const applyUrlBtn = document.getElementById("applySpoolmanUrlBtn");
+
+const DEFAULT_SPOOLMAN_URL = "/spoolman";
+
+// Read override from URL param
+const paramUrlEncoded = getUrlParam("spoolman");
+  let spoolmanUrl = DEFAULT_SPOOLMAN_URL;
+  let spoolLoadSucceeded = false;
+
+if (paramUrlEncoded) {
+  try {
+    spoolmanUrl = decodeURIComponent(paramUrlEncoded);
+  } catch {
+    spoolmanUrl = DEFAULT_SPOOLMAN_URL;
+  }
+}
+
+  spoolUrlInput.value = spoolmanUrl;
+  loadSpoolman(spoolmanUrl);
+
+function loadSpoolman(url) {
+  spoolFrame.src = url;
+}
+spoolFrame.addEventListener("load", () => {
+  spoolLoadSucceeded = true;
+  console.log("Spoolman iframe loaded");
+});
+setTimeout(() => {
+  if (!spoolLoadSucceeded) {
+    log("Spoolman failed to load — showing settings");
+    settingsPanel.style.display = "block";
+  }
+}, 4000);
+
+  
 /* ---------- Logging ---------- */
 
 function log(line) {
@@ -238,6 +298,38 @@ copyBtn.onclick = () => {
   /*() => {
   console.log("Export clicked");
 };*/
+
+function getUrlParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+function setUrlParam(name, value) {
+  const params = new URLSearchParams(window.location.search);
+
+  if (value === null) params.delete(name);
+  else params.set(name, encodeURIComponent(value));
+
+  const newUrl = window.location.pathname + "?" + params.toString();
+  window.history.replaceState({}, "", newUrl);
+}
+
+
+settingsBtn.onclick = () => {
+  settingsPanel.style.display =
+    settingsPanel.style.display === "none" ? "block" : "none";
+};
+spoolUrlInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") applyUrlBtn.click();
+});
+applyUrlBtn.onclick = () => {
+  const url = spoolUrlInput.value.trim();
+  if (!url) return;
+
+  setUrlParam("spoolman", url);
+  loadSpoolman(url);
+};
+
   
 </script>
 

@@ -5,21 +5,21 @@ Instead of creating a custom API or app, this:
 - Opens Spoolman as an iframe and fills out a custom TD field on demand within the nominal Spoolman UI for defining filaments or spools.
 
 
-*UNTESTED* The "Generate Hueforge DB" button will download a JSON file that can be imported into HueForge as a new Filament DB/Set. This is a first-cut at such a feature and has not yet been tested in HueForge.  Spoolman's 'archived' flag is inverted to become HueForge's 'owned' flag.  Future updates may add additional filtering options.
+The "Generate Hueforge DB" button will download a JSON file that can be imported into HueForge as a new Filament DB/Set. Spoolman's 'archived' flag is inverted to become HueForge's 'owned' flag.  Future updates may add additional filtering options.
 
 # Usage
 
 To read values from your TD1 without any other dependencies, simply visit the index.html page in any browser and press 'Connect' with your TD1 connected.  [Try it out here.](https://digicrat.github.io/td1_browser/)
 
-To read values directly into Spoolman, visit spoolman.html (see Setup section for details/caveats). Navigate within Spoolman on the left to create a new Filament and/or Spool as desired.  After reading a filament, simply press the 'Copy values' button on the right to automatically populate the 'extra' field in Spoolman's existing UI. If adding multiple filaments in a row, you can check 'Auto' to copy it automatically on each reading.
+To read values directly into Spoolman, visit [spoolman.html](https://digicrat.github.io/td1_browser/spoolman.html) (see Setup section for details/caveats). Press the settings icon and enter the URL to your spoolman instance.  This will be added to the urlParams so you can bookmark the page for future reference.
+
+Navigate within Spoolman on the left to create (or update) a new Filament and/or Spool as desired.  After reading a filament, simply press the 'Copy values' button on the right to automatically populate the 'extra' field in Spoolman's existing UI. If adding multiple filaments in a row, you can check 'Auto' to copy it automatically on each reading.
 
 
 # Setup
-This is a static HTML/JS modification.  Simply host it appropriately.
+This is a static HTML/JS modification.  Simply host it appropriately and configure spoolman custom fields.
 
-## Spoolman
-
-### Proxy Hosting
+## Proxy Hosting
 This assumes that spoolman is available at "./spoolman" by default.  If that is not the case, edit the iframe definition in spoolman.html.  Some features may not work correctly if hosted on a different server.
 
 On my server:
@@ -34,7 +34,7 @@ Apache configuration:
 
 To configure spoolman to be accessible at a subdomain when hosting via Docker, simply set the ENV variable SPOOLMAN_BASE_PATH=/spoolman.  
 
-### Custom Fields
+## Spoolman Custom Fields
 
 In Spoolman->Settings->Extra Fields define a new field named "TD" for both Spools and/or Filaments. The type should be set to "float"
 
